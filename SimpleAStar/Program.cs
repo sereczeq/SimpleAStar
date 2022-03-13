@@ -69,7 +69,18 @@ namespace SimpleAStar
 
         public void CalculateNode(int index, int currentTime = 0)
         {
-            times[index] = currentTime + nodes[index];
+            var myTime = times[index];
+            var myWeight = nodes[index];
+            Console.WriteLine($"Node {index} with weight {myWeight} currently has time {myTime}");
+            if (myTime == 0)
+            {
+                times[index] = currentTime + myWeight;
+            }
+            else if (myTime - myWeight > currentTime)
+            {
+                times[index] = currentTime + myWeight;
+            }
+            Console.WriteLine($"Node {index} with weight {myWeight} now has time {times[index]}");
             foreach (var child in connections[index])
             {
                 CalculateNode(child, times[index]);
