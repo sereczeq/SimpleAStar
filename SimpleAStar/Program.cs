@@ -9,13 +9,14 @@ namespace SimpleAStar
 {
     internal class Program
     {
-        public readonly string path = @"D:\Uni\AI\SimpleAStar\SimpleAStar\SimpleAStar\";
+        private const string Path = @"D:\Uni\AI\SimpleAStar\SimpleAStar\SimpleAStar\";
 
-        public readonly List<string> fileNames = new List<string>()
+        private readonly List<string> _fileNames = new List<string>()
         {
             "default.txt",
-            "test_large.dag",
-            "test_large_sparse.dag",
+
+            // "test_large.dag",
+            // "test_large_sparse.dag",
             "test_medium.dag",
             "test_medium_sparse.dag",
             "test_small.dag",
@@ -24,47 +25,52 @@ namespace SimpleAStar
             "test_xlarge_sparse.dag",
         };
 
+        // Nodes stored as indexes and weights, for example node 2 has weight 50
         private List<float> _nodes = new List<float> {41, 51, 50, 36, 38, 45, 21, 32, 29};
         
+        // Connections stored as indexes and Lists of indexes, for example node 8 is pointing towards nodes 4 and 5
         private List<List<int>> _connections = new List<List<int>>
         {
             new List<int> {1, 6, 8},
             new List<int> {2},
-            new List<int> {},
-            new List<int> {},
-            new List<int> {},
+            new List<int> { },
+            new List<int> { },
+            new List<int> { },
             new List<int> {3, 7},
             new List<int> {3, 7},
             new List<int> {2},
             new List<int> {4, 5}
         };
 
-        List<float> times = Enumerable.Repeat(0f, 9).ToList();
-        
+        // Time it takes to pass a node, initialized as 0
+        private List<float> _times = Enumerable.Repeat(0f, 9).ToList();
+
         public static void Main(string[] args)
         {
             var program = new Program();
-            foreach (var fileName in program.fileNames)
+            foreach (var fileName in program._fileNames)
             {
                 Console.Write(fileName + " will take: ");
-                var path = program.path + fileName;
+                var path = Program.Path + fileName;
                 program.ReadFile(path);
                 var time = DateTime.Now;
                 program.CalculateNode(0);
-                var max = program.times.Max();
+                // Find the maximum time of all shortest paths (explained in report)
+                var max = program._times.Max();
                 Console.WriteLine(max);
                 var timeDif = DateTime.Now - time;
                 Console.WriteLine($"Operation took: {timeDif.Milliseconds} milliseconds ({timeDif.Ticks} ticks)");
                 Console.WriteLine("---------------------------------------");
             }
-           
         }
 
 
-        public void ReadFile(string pathToFile)
+        private void ReadFile(string pathToFile)
         {
             var lines = File.ReadAllLines(pathToFile);
+            
             var count = int.Parse(lines.First());
+            
             _nodes = new List<float>();
             for (var i = 1; i < count + 1; i++)
             {
@@ -82,6 +88,7 @@ namespace SimpleAStar
                 {
                     connections = new List<int>();
                 }
+
                 _connections.Add(connections);
             }
 
@@ -95,50 +102,40 @@ namespace SimpleAStar
             //     Console.WriteLine(print);
             // }
 
-            times = Enumerable.Repeat(0f, _nodes.Count).ToList();
+            _times = Enumerable.Repeat(0f, _nodes.Count).ToList();
         }
-        public void CalculateNode(int index, float currentTime = 0f)
+
+        private void CalculateNode(int index, float currentTime = 0f)
         {
             // Console.WriteLine($", current time {currentTime}...");
-            var myTime = times[index];
+            var myTime = _times[index];
             var myWeight = _nodes[index];
+            // If it's the first time visiting the node, just assign it current time + it's time
             if (myTime == 0)
             {
-                times[index] = currentTime + myWeight;
+                _times[index] = currentTime + myWeight;
             }
+            // If it's not the first time visiting the node, compare if current way to get to it is better
             else if (myTime - myWeight > currentTime)
             {
-                times[index] = currentTime + myWeight;
+                // if current way is better, update the time and proceed to check children
+                _times[index] = currentTime + myWeight;
             }
+            // If the current way is not better, don't check the node anymore
             else
             {
                 // Console.WriteLine($"...Finished checking {index}, current time {currentTime}");
                 return;
             }
+
+            // Check all children of the node
             foreach (var child in _connections[index])
             {
                 // Console.Write($"Checking {child} as child of {index}");
-                CalculateNode(child, times[index]);
+                CalculateNode(child, _times[index]);
             }
+
             // Console.WriteLine($"...Finished checking {index}, current time {currentTime}");
         }
-
-        // public IEnumerable<int> GetLastNodes()
-        // {
-        //     var result = new List<int>();
-        //     for (var i = 0; i < _connections.Count; i++)
-        //     {
-        //         if (_connections[i].Count == 0)
-        //         {
-        //             result.Add(i);
-        //         }
-        //     }
-        //     return result;
-        // }
-        //
-        // public int GetMaxFromNodes(IEnumerable<int> lastNodes)
-        // {
-        //     return lastNodes.Select(node => times[node]).Max();
-        // }
     }
 }
