@@ -1,14 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 
 namespace SimpleAStar
 {
     internal class Program
     {
-        List<int> nodes = new List<int> {41, 51, 50, 36, 38, 45, 21, 32, 29};
-        List<List<int>> connections = new List<List<int>>
+        public readonly string path = @"D:\Uni\AI\SimpleAStar\SimpleAStar\SimpleAStar\";
+
+        public readonly List<string> fileNames = new List<string>()
+        {
+            "default.txt",
+            "test_large.dag",
+            "test_large_sparse.dag",
+            "test_medium.dag",
+            "test_medium_sparse.dag",
+            "test_small.dag",
+            "test_small_sparse.dag",
+            "test_xlarge.dag",
+            "test_xlarge_sparse.dag",
+        };
+
+        private List<float> _nodes = new List<float> {41, 51, 50, 36, 38, 45, 21, 32, 29};
+        
+        private List<List<int>> _connections = new List<List<int>>
         {
             new List<int> {1, 6, 8},
             new List<int> {2},
@@ -21,57 +39,69 @@ namespace SimpleAStar
             new List<int> {4, 5}
         };
 
-        List<int> times = Enumerable.Repeat(0, 9).ToList();
+        List<float> times = Enumerable.Repeat(0f, 9).ToList();
         
         public static void Main(string[] args)
         {
             var program = new Program();
-            // var result = program.FindTime();
-            // Console.WriteLine(result);
-            
-            program.CalculateNode(0);
-            var last = program.GetLastNodes();
-            var max = program.GetMaxFromNodes(last);
-            Console.WriteLine(max);
-
-
-
-
+            foreach (var fileName in program.fileNames)
+            {
+                Console.Write(fileName + " will take: ");
+                var path = program.path + fileName;
+                program.ReadFile(path);
+                var time = DateTime.Now;
+                program.CalculateNode(0);
+                var max = program.times.Max();
+                Console.WriteLine(max);
+                var timeDif = DateTime.Now - time;
+                Console.WriteLine($"Operation took: {timeDif.Milliseconds} milliseconds ({timeDif.Ticks} ticks)");
+                Console.WriteLine("---------------------------------------");
+            }
+           
         }
 
-        public int FindTime()
+
+        public void ReadFile(string pathToFile)
         {
-            for (var i = 0; i < nodes.Count; i++)
+            var lines = File.ReadAllLines(pathToFile);
+            var count = int.Parse(lines.First());
+            _nodes = new List<float>();
+            for (var i = 1; i < count + 1; i++)
             {
-                Console.WriteLine($"Starting checking node number {i}...");
-                foreach (var child in connections[i])
+                var node = float.Parse(lines[i], CultureInfo.InvariantCulture);
+                _nodes.Add(node);
+            }
+
+            _connections = new List<List<int>>();
+            for (var i = count + 1; i < count * 2 + 1; i++)
+            {
+                var text = lines[i];
+                var list = text.Split(' ');
+                var connections = list.Select(int.Parse).ToList();
+                if (connections.First() == -1)
                 {
-                    Console.WriteLine($"Checking child {child}");
-                    var currentTimeToGetToChild = times[child];
-                    var myTimeToGetToChild = times[i] + nodes[i];
-                    Console.WriteLine($"Current child time {currentTimeToGetToChild}, My child time {myTimeToGetToChild}");
-                    if (myTimeToGetToChild < currentTimeToGetToChild || currentTimeToGetToChild == 0)
-                    {
-                        times[child] = myTimeToGetToChild;
-                    }
-                    Console.WriteLine($"Node {child} has time {times[child]}");
+                    connections = new List<int>();
                 }
-                Console.WriteLine($"...Finished checking node number {i}");
+                _connections.Add(connections);
             }
 
-            for (var i = 0; i < nodes.Count; i++)
-            {
-                times[i] += nodes[i];
-            }
+            // for (var i = 0; i < _nodes.Count; i++)
+            // {
+            //     var print = _nodes[i] + " => ";
+            //     foreach (var connection in _connections[i])
+            //     {
+            //         print += connection + " ";
+            //     }
+            //     Console.WriteLine(print);
+            // }
 
-            return times.Max();
+            times = Enumerable.Repeat(0f, _nodes.Count).ToList();
         }
-
-        public void CalculateNode(int index, int currentTime = 0)
+        public void CalculateNode(int index, float currentTime = 0f)
         {
+            // Console.WriteLine($", current time {currentTime}...");
             var myTime = times[index];
-            var myWeight = nodes[index];
-            Console.WriteLine($"Node {index} with weight {myWeight} currently has time {myTime}");
+            var myWeight = _nodes[index];
             if (myTime == 0)
             {
                 times[index] = currentTime + myWeight;
@@ -80,29 +110,35 @@ namespace SimpleAStar
             {
                 times[index] = currentTime + myWeight;
             }
-            Console.WriteLine($"Node {index} with weight {myWeight} now has time {times[index]}");
-            foreach (var child in connections[index])
+            else
             {
+                // Console.WriteLine($"...Finished checking {index}, current time {currentTime}");
+                return;
+            }
+            foreach (var child in _connections[index])
+            {
+                // Console.Write($"Checking {child} as child of {index}");
                 CalculateNode(child, times[index]);
             }
+            // Console.WriteLine($"...Finished checking {index}, current time {currentTime}");
         }
 
-        public List<int> GetLastNodes()
-        {
-            var result = new List<int>();
-            for (int i = 0; i < connections.Count; i++)
-            {
-                if (connections[i].Count == 0)
-                {
-                    result.Add(i);
-                }
-            }
-            return result;
-        }
-
-        public int GetMaxFromNodes(IEnumerable<int> lastNodes)
-        {
-            return lastNodes.Select(node => times[node]).Max();
-        }
+        // public IEnumerable<int> GetLastNodes()
+        // {
+        //     var result = new List<int>();
+        //     for (var i = 0; i < _connections.Count; i++)
+        //     {
+        //         if (_connections[i].Count == 0)
+        //         {
+        //             result.Add(i);
+        //         }
+        //     }
+        //     return result;
+        // }
+        //
+        // public int GetMaxFromNodes(IEnumerable<int> lastNodes)
+        // {
+        //     return lastNodes.Select(node => times[node]).Max();
+        // }
     }
 }

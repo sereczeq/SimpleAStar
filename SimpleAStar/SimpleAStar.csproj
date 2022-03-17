@@ -42,6 +42,17 @@
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
+    <ItemGroup>
+      <Content Include="default.txt" />
+      <Content Include="test_large.dag" />
+      <Content Include="test_large_sparse.dag" />
+      <Content Include="test_medium.dag" />
+      <Content Include="test_medium_sparse.dag" />
+      <Content Include="test_small.dag" />
+      <Content Include="test_small_sparse.dag" />
+      <Content Include="test_xlarge.dag" />
+      <Content Include="test_xlarge_sparse.dag" />
+    </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
