@@ -27,7 +27,7 @@ namespace SimpleAStar
 
         // Nodes stored as indexes and weights, for example node 2 has weight 50
         private List<float> _nodes = new List<float> {41, 51, 50, 36, 38, 45, 21, 32, 29};
-        
+
         // Connections stored as indexes and Lists of indexes, for example node 8 is pointing towards nodes 4 and 5
         private List<List<int>> _connections = new List<List<int>>
         {
@@ -55,6 +55,7 @@ namespace SimpleAStar
                 program.ReadFile(path);
                 var time = DateTime.Now;
                 program.CalculateNode(0);
+
                 // Find the maximum time of all shortest paths (explained in report)
                 var max = program._times.Max();
                 Console.WriteLine(max);
@@ -68,9 +69,9 @@ namespace SimpleAStar
         private void ReadFile(string pathToFile)
         {
             var lines = File.ReadAllLines(pathToFile);
-            
+
             var count = int.Parse(lines.First());
-            
+
             _nodes = new List<float>();
             for (var i = 1; i < count + 1; i++)
             {
@@ -110,17 +111,20 @@ namespace SimpleAStar
             // Console.WriteLine($", current time {currentTime}...");
             var myTime = _times[index];
             var myWeight = _nodes[index];
+
             // If it's the first time visiting the node, just assign it current time + it's time
             if (myTime == 0)
             {
                 _times[index] = currentTime + myWeight;
             }
+
             // If it's not the first time visiting the node, compare if current way to get to it is better
             else if (myTime - myWeight > currentTime)
             {
                 // if current way is better, update the time and proceed to check children
                 _times[index] = currentTime + myWeight;
             }
+
             // If the current way is not better, don't check the node anymore
             else
             {
