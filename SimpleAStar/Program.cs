@@ -14,9 +14,8 @@ namespace SimpleAStar
         private readonly List<string> _fileNames = new List<string>()
         {
             "default.txt",
-
-            // "test_large.dag",
-            // "test_large_sparse.dag",
+            "test_large.dag",
+            "test_large_sparse.dag",
             "test_medium.dag",
             "test_medium_sparse.dag",
             "test_small.dag",
@@ -119,7 +118,7 @@ namespace SimpleAStar
             }
 
             // If it's not the first time visiting the node, compare if current way to get to it is better
-            else if (myTime - myWeight > currentTime)
+            else if (myTime - myWeight < currentTime)
             {
                 // if current way is better, update the time and proceed to check children
                 _times[index] = currentTime + myWeight;
