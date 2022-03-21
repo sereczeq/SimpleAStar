@@ -25,7 +25,7 @@ namespace SimpleAStar
         };
 
         // Nodes stored as indexes and weights, for example node 2 has weight 50
-        private List<float> _nodes = new List<float> {41, 51, 50, 36, 38, 45, 21, 32, 29};
+        private List<double> _nodes = new List<double> {41, 51, 50, 36, 38, 45, 21, 32, 29};
 
         // Connections stored as indexes and Lists of indexes, for example node 8 is pointing towards nodes 4 and 5
         private List<List<int>> _connections = new List<List<int>>
@@ -42,7 +42,7 @@ namespace SimpleAStar
         };
 
         // Time it takes to pass a node, initialized as 0
-        private List<float> _times = Enumerable.Repeat(0f, 9).ToList();
+        private List<double> _times = Enumerable.Repeat(0.0, 9).ToList();
 
         public static void Main(string[] args)
         {
@@ -53,11 +53,14 @@ namespace SimpleAStar
                 var path = Program.Path + fileName;
                 program.ReadFile(path);
                 var time = DateTime.Now;
-                program.CalculateNode(0);
-
-                // Find the maximum time of all shortest paths (explained in report)
-                var max = program._times.Max();
-                Console.WriteLine(max);
+                
+                
+                
+                // program.CalculateNode(0);
+                //
+                // // Find the maximum time of all shortest paths (explained in report)
+                // var max = program._times.Max();
+                // Console.WriteLine(max);
                 var timeDif = DateTime.Now - time;
                 Console.WriteLine($"Operation took: {timeDif.Milliseconds} milliseconds ({timeDif.Ticks} ticks)");
                 Console.WriteLine("---------------------------------------");
@@ -71,7 +74,7 @@ namespace SimpleAStar
 
             var count = int.Parse(lines.First());
 
-            _nodes = new List<float>();
+            _nodes = new List<double>();
             for (var i = 1; i < count + 1; i++)
             {
                 var node = float.Parse(lines[i], CultureInfo.InvariantCulture);
@@ -102,10 +105,10 @@ namespace SimpleAStar
             //     Console.WriteLine(print);
             // }
 
-            _times = Enumerable.Repeat(0f, _nodes.Count).ToList();
+            _times = Enumerable.Repeat(0.0, _nodes.Count).ToList();
         }
 
-        private void CalculateNode(int index, float currentTime = 0f)
+        private void CalculateNode(int index, double currentTime = 0f)
         {
             // Console.WriteLine($", current time {currentTime}...");
             var myTime = _times[index];
