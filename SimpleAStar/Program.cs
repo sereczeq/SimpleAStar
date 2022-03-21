@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace SimpleAStar
@@ -10,7 +11,7 @@ namespace SimpleAStar
 
         private static readonly List<string> FileNames = new List<string>()
         {
-            "default.txt",
+            // "default.txt",
 
             // "test_large.dag",
             // "test_large_sparse.dag",
@@ -26,11 +27,11 @@ namespace SimpleAStar
 
         private static readonly List<HeuristicEnum> HeuristicEnums = new List<HeuristicEnum>
         {
-            // HeuristicEnum.Random,
-            HeuristicEnum.BruteForce,
+            HeuristicEnum.Random,
+            // HeuristicEnum.BruteForce,
 
-            // HeuristicEnum.SmallestWeight,
-            // HeuristicEnum.CountUntilEnd,
+            HeuristicEnum.SmallestWeight,
+            HeuristicEnum.CountUntilEnd,
         };
 
         public static void Main(string[] args)
@@ -45,12 +46,25 @@ namespace SimpleAStar
                 {
                     AStar.CalculateHeuristics(setupNodes, heuristic);
                     var path = AStar.GetPath(setupNodes.Last());
-                    foreach (var node in path)
-                    {
-                        Console.WriteLine(node);
-                    }
+
+                    DebugInfo(fileName, heuristic, path);
                 }
             }
+        }
+
+        private static void DebugInfo(string fileName, HeuristicEnum heuristic, IEnumerable<Node> path)
+        {
+            var debug = $"For file {fileName} and heuristic {heuristic}, the path is:\n";
+            var totalTime = 0.0;
+            foreach (var node in path)
+            {
+                totalTime += node.MyWeight;
+                debug += node + "\n";
+            }
+
+            debug += $"With total wight of {totalTime}";
+            debug += "\n------------------------------------------------\n";
+            Console.WriteLine(debug);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace SimpleAStar
     {
         private readonly int _index;
         
-        private readonly double _myWeight;
+        public double MyWeight { get; }
 
         private double _g;
 
@@ -24,7 +24,7 @@ namespace SimpleAStar
         public Node(int index, double myWeight)
         {
             _index = index;
-            _myWeight = myWeight;
+            MyWeight = myWeight;
             _parents = new List<Node>();
             _children = new List<Node>();
         }
@@ -96,7 +96,7 @@ namespace SimpleAStar
         {
             if (_h == 0)
             {
-                _h = _myWeight;
+                _h = MyWeight;
             }
 
             // h += children.Select(child => child.BruteForce()).Max();
@@ -128,7 +128,7 @@ namespace SimpleAStar
 
         private void SmallestGHeuristic()
         {
-            _h = _myWeight;
+            _h = MyWeight;
         }
 
         private void RandomHeuristic()
