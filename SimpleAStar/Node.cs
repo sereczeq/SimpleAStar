@@ -70,30 +70,51 @@ namespace SimpleAStar
         private void BruteForceHeuristic()
         {
             if(_parents.Count != 0) return;
-            _h = BruteForce();
+            DepthFirst(0);
         }
 
-        private double BruteForce()
+        // private double BruteForce()
+        // {
+        //     if (_h == 0)
+        //     {
+        //         _h = MyWeight;
+        //     }
+        //
+        //     // h += children.Select(child => child.BruteForce()).Max();
+        //
+        //     var childWeights = new List<double>();
+        //     foreach (var child in Children)
+        //     {
+        //         var childWeight = child.BruteForce();
+        //         childWeights.Add(childWeight);
+        //     }
+        //
+        //     if (childWeights.Count != 0)
+        //     {
+        //         _h += childWeights.Max();
+        //     }
+        //     return _h;
+        // }
+
+        private void DepthFirst(double currentWeight)
         {
             if (_h == 0)
             {
-                _h = MyWeight;
+                _h = currentWeight + MyWeight;
+            }
+            else if (_h - MyWeight < currentWeight)
+            {
+                _h = currentWeight + MyWeight;
+            }
+            else
+            {
+                return;
             }
 
-            // h += children.Select(child => child.BruteForce()).Max();
-
-            var childWeights = new List<double>();
             foreach (var child in Children)
             {
-                var childWeight = child.BruteForce();
-                childWeights.Add(childWeight);
+                child.DepthFirst(_h);
             }
-
-            if (childWeights.Count != 0)
-            {
-                _h += childWeights.Max();
-            }
-            return _h;
         }
 
         private void CountUntilEndHeuristic()

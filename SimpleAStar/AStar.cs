@@ -42,7 +42,7 @@ namespace SimpleAStar
             Console.WriteLine($"Calculating heuristics took {stopWatch.Elapsed}");
         }
 
-        public static IEnumerable<Node> GetPath(Node parentNode)
+        public static List<Node> GetPath(Node parentNode)
         {
             var open = new List<Node>();
 
@@ -55,11 +55,11 @@ namespace SimpleAStar
 
             while (node.HasNext())
             {
-                // Find the Node with smallest F
+                // Find the Node with biggest F
                 node = open[0];
                 foreach (var n in open)
                 {
-                    if (n.F <= node.F) continue;
+                    if (n.F > node.F) continue;
                     node = n;
                 }
                 

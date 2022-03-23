@@ -11,24 +11,24 @@ namespace SimpleAStar
 
         private static readonly List<string> FileNames = new List<string>()
         {
-            // "default.txt",
+            "default.txt",
 
-            // "test_large.dag",
-            // "test_large_sparse.dag",
+            "test_large.dag",
+            "test_large_sparse.dag",
             "test_medium.dag",
 
-            // "test_medium_sparse.dag",
-            // "test_small.dag",
-            // "test_small_sparse.dag",
-            // "test_xlarge.dag",
-            // "test_xlarge_sparse.dag",
+            "test_medium_sparse.dag",
+            "test_small.dag",
+            "test_small_sparse.dag",
+            "test_xlarge.dag",
+            "test_xlarge_sparse.dag",
         };
 
 
         private static readonly List<HeuristicEnum> HeuristicEnums = new List<HeuristicEnum>
         {
-            HeuristicEnum.Random,
-            // HeuristicEnum.BruteForce,
+            // HeuristicEnum.Random,
+            HeuristicEnum.BruteForce,
 
             // HeuristicEnum.SmallestWeight,
             // HeuristicEnum.CountUntilEnd,
@@ -42,7 +42,7 @@ namespace SimpleAStar
                 FileReader.ReadFile(filePath, out var nodes, out var connections);
 
                 var setupNodes = AStar.SetupNodes(nodes, connections).ToList();
-                
+
                 foreach (var heuristic in HeuristicEnums)
                 {
                     AStar.CalculateHeuristics(setupNodes, heuristic);
@@ -53,17 +53,25 @@ namespace SimpleAStar
             }
         }
 
-        private static void DebugInfo(string fileName, HeuristicEnum heuristic, IEnumerable<Node> path)
+        private static void DebugInfo(string fileName, HeuristicEnum heuristic, List<Node> path,
+            bool detail = false)
         {
-            var debug = $"For file {fileName} and heuristic {heuristic}, the path is:\n";
-            var totalTime = 0.0;
-            foreach (var node in path)
+            var debug = $"For file {fileName} and heuristic {heuristic}";
+            var totalTime = path.Sum(node => node.MyWeight);
+            if (detail)
             {
-                totalTime += node.MyWeight;
-                debug += node + "\n";
-            }
+                debug += ", the path is\n";
+                foreach (var node in path)
+                {
+                    debug += node + "\n";
+                }
 
-            debug += $"With total weight of {totalTime}";
+                debug += $"With total weight of {totalTime}";
+            }
+            else
+            {
+                debug += $" the total time is {totalTime}";
+            }
             debug += "\n------------------------------------------------\n";
             Console.WriteLine(debug);
         }
