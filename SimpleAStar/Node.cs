@@ -57,7 +57,10 @@ namespace SimpleAStar
                     CountUntilEndHeuristic();
                     break;
                 case HeuristicEnum.SmallestWeight:
-                    SmallestGHeuristic();
+                    SmallestWeightHeuristic();
+                    break;
+                case HeuristicEnum.ChildWeights:
+                    ChildWeights();
                     break;
                 case HeuristicEnum.Random:
                 default:
@@ -72,30 +75,7 @@ namespace SimpleAStar
             if(_parents.Count != 0) return;
             DepthFirst(0);
         }
-
-        // private double BruteForce()
-        // {
-        //     if (_h == 0)
-        //     {
-        //         _h = MyWeight;
-        //     }
-        //
-        //     // h += children.Select(child => child.BruteForce()).Max();
-        //
-        //     var childWeights = new List<double>();
-        //     foreach (var child in Children)
-        //     {
-        //         var childWeight = child.BruteForce();
-        //         childWeights.Add(childWeight);
-        //     }
-        //
-        //     if (childWeights.Count != 0)
-        //     {
-        //         _h += childWeights.Max();
-        //     }
-        //     return _h;
-        // }
-
+        
         private void DepthFirst(double currentWeight)
         {
             if (_h == 0)
@@ -122,13 +102,13 @@ namespace SimpleAStar
             _h = CountDepth();
         }
 
-        private int CountDepth()
+        private double CountDepth()
         {
-            if (Children.Count == 0) return 1;
-            return 1 + Children.First().CountDepth();
+            if (Children.Count == 0) return MyWeight;
+            return MyWeight + Children.First().CountDepth();
         }
 
-        private void SmallestGHeuristic()
+        private void SmallestWeightHeuristic()
         {
             _h = MyWeight;
         }
@@ -136,7 +116,12 @@ namespace SimpleAStar
         private void RandomHeuristic()
         {
             var random = new Random(Children.Count + _index * DateTime.Now.Millisecond);
-            _h = random.NextDouble();
+            _h = random.NextDouble() * MyWeight;
+        }
+
+        private void ChildWeights()
+        {
+            _h = Children.Sum(child => child.MyWeight);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 
 namespace SimpleAStar
@@ -27,11 +26,11 @@ namespace SimpleAStar
 
         private static readonly List<HeuristicEnum> HeuristicEnums = new List<HeuristicEnum>
         {
-            // HeuristicEnum.Random,
+            HeuristicEnum.Random,
             HeuristicEnum.BruteForce,
-
-            // HeuristicEnum.SmallestWeight,
-            // HeuristicEnum.CountUntilEnd,
+            HeuristicEnum.SmallestWeight,
+            HeuristicEnum.CountUntilEnd,
+            HeuristicEnum.ChildWeights
         };
 
         public static void Main(string[] args)
@@ -39,41 +38,48 @@ namespace SimpleAStar
             foreach (var fileName in FileNames)
             {
                 var filePath = Path + fileName;
+                
+                Console.WriteLine($"<File: {fileName}>");
+                
                 FileReader.ReadFile(filePath, out var nodes, out var connections);
 
                 var setupNodes = AStar.SetupNodes(nodes, connections).ToList();
 
                 foreach (var heuristic in HeuristicEnums)
                 {
+                    Console.WriteLine($"<Heuristic: {heuristic}>");
                     AStar.CalculateHeuristics(setupNodes, heuristic);
                     var path = AStar.GetPath(setupNodes.Last());
 
-                    DebugInfo(fileName, heuristic, path);
+                    DebugInfo(path, true);
+                    Console.WriteLine($"<\\Heuristic: {heuristic}>\n" +
+                                      $"\n--------------------------------------------------------------\n");
                 }
+                
+                Console.WriteLine($"<\\File: {fileName}>\n" +
+                                  $"\n--------------------------------------------------------------\n" +
+                                  $"\n--------------------------------------------------------------\n" +
+                                  $"\n--------------------------------------------------------------\n");
             }
         }
 
-        private static void DebugInfo(string fileName, HeuristicEnum heuristic, List<Node> path,
+        private static void DebugInfo(List<Node> path,
             bool detail = false)
         {
-            var debug = $"For file {fileName} and heuristic {heuristic}";
             var totalTime = path.Sum(node => node.MyWeight);
-            if (detail)
+            Console.WriteLine($"Total time is {totalTime}");
+            if (!detail) return;
             {
-                debug += ", the path is\n";
+                var debug = "";
+                debug += "The path is\n";
                 foreach (var node in path)
                 {
                     debug += node + "\n";
                 }
 
                 debug += $"With total weight of {totalTime}";
+                Console.WriteLine(debug);
             }
-            else
-            {
-                debug += $" the total time is {totalTime}";
-            }
-            debug += "\n------------------------------------------------\n";
-            Console.WriteLine(debug);
         }
     }
 }

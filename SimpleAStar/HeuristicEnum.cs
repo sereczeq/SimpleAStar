@@ -5,6 +5,7 @@
         BruteForce,
         CountUntilEnd,
         SmallestWeight,
-        Random
+        Random,
+        ChildWeights
     }
 }
