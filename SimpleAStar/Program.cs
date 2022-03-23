@@ -30,8 +30,8 @@ namespace SimpleAStar
             HeuristicEnum.Random,
             // HeuristicEnum.BruteForce,
 
-            HeuristicEnum.SmallestWeight,
-            HeuristicEnum.CountUntilEnd,
+            // HeuristicEnum.SmallestWeight,
+            // HeuristicEnum.CountUntilEnd,
         };
 
         public static void Main(string[] args)
@@ -42,6 +42,7 @@ namespace SimpleAStar
                 FileReader.ReadFile(filePath, out var nodes, out var connections);
 
                 var setupNodes = AStar.SetupNodes(nodes, connections).ToList();
+                
                 foreach (var heuristic in HeuristicEnums)
                 {
                     AStar.CalculateHeuristics(setupNodes, heuristic);
@@ -62,7 +63,7 @@ namespace SimpleAStar
                 debug += node + "\n";
             }
 
-            debug += $"With total wight of {totalTime}";
+            debug += $"With total weight of {totalTime}";
             debug += "\n------------------------------------------------\n";
             Console.WriteLine(debug);
         }

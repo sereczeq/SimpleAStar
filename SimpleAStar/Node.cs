@@ -10,59 +10,40 @@ namespace SimpleAStar
         
         public double MyWeight { get; }
 
-        private double _g;
+        public double G;
 
         private double _h;
 
 
-        private double F => _g + _h;
+        public double F => G + _h;
 
         private readonly List<Node> _parents;
 
-        private readonly List<Node> _children;
+        public readonly List<Node> Children;
+        public Node Parent;
 
         public Node(int index, double myWeight)
         {
             _index = index;
             MyWeight = myWeight;
             _parents = new List<Node>();
-            _children = new List<Node>();
+            Children = new List<Node>();
         }
 
         public void AddChild(Node child)
         {
-            _children.Add(child);
+            Children.Add(child);
             child._parents.Add(this);
         }
 
         public override string ToString()
         {
-            return $"Node {_index}, g = {_g}, h = {_h}, F = {F}";
+            return $"Node {_index}, {MyWeight:F15}, g = {G:F15}, h = {_h:F15}, F = {F:F15}";
         }
 
         public bool HasNext()
         {
-            return _children.Count != 0;
-        }
-
-        public Node Traverse()
-        {
-            if (!HasNext())
-            {
-                throw new IndexOutOfRangeException();
-            }
-            var maxNode = _children.First();
-            foreach (var child in _children)
-            {
-                if (child._g < _g)
-                {
-                    child._g = _g;
-                }
-                if (child.F < maxNode.F) continue;
-                maxNode = child;
-            }
-            
-            return maxNode;
+            return Children.Count != 0;
         }
 
         public void CalculateHeuristic(HeuristicEnum heuristicEnum)
@@ -102,7 +83,7 @@ namespace SimpleAStar
             // h += children.Select(child => child.BruteForce()).Max();
 
             var childWeights = new List<double>();
-            foreach (var child in _children)
+            foreach (var child in Children)
             {
                 var childWeight = child.BruteForce();
                 childWeights.Add(childWeight);
@@ -122,8 +103,8 @@ namespace SimpleAStar
 
         private int CountDepth()
         {
-            if (_children.Count == 0) return 1;
-            return 1 + _children.First().CountDepth();
+            if (Children.Count == 0) return 1;
+            return 1 + Children.First().CountDepth();
         }
 
         private void SmallestGHeuristic()
@@ -133,7 +114,7 @@ namespace SimpleAStar
 
         private void RandomHeuristic()
         {
-            var random = new Random(_children.Count + _index * DateTime.Now.Millisecond);
+            var random = new Random(Children.Count + _index * DateTime.Now.Millisecond);
             _h = random.NextDouble();
         }
     }

@@ -44,20 +44,56 @@ namespace SimpleAStar
 
         public static IEnumerable<Node> GetPath(Node parentNode)
         {
-            var path = new List<Node>();
+            var open = new List<Node>();
+
+            parentNode.G = parentNode.MyWeight;
+            open.Add(parentNode);
+            var node = open[0];
 
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            while (parentNode.HasNext())
+            while (node.HasNext())
             {
-                path.Add(parentNode);
-                parentNode = parentNode.Traverse();
+                // Find the Node with smallest F
+                node = open[0];
+                foreach (var n in open)
+                {
+                    if (n.F <= node.F) continue;
+                    node = n;
+                }
+                
+                open.Remove(node);
+
+                foreach (var child in node.Children)
+                {
+                    var currentTime = node.G + node.MyWeight;
+                    
+                    // If the time to get to child is smaller than current, continue checking, this is not the one
+                    if (currentTime < child.G) continue;
+                    child.Parent = node;
+                    child.G = currentTime;
+                    if(open.Contains(child)) continue;
+                    open.Add(child);
+                }
             }
 
+
+
+            
             stopWatch.Stop();
             Console.WriteLine($"Traversing took {stopWatch.Elapsed}");
 
+            
+            // Create the path, going from the last node and it's parents
+            var path = new List<Node>();
+            while (node.Parent != null)
+            {
+                path.Add(node);
+                node = node.Parent;
+            }
+            path.Reverse();
+            
             return path;
         }
 
